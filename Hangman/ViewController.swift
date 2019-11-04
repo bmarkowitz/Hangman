@@ -98,6 +98,7 @@ class ViewController: UIViewController {
     func loadLevel() {
         numberOfGuesses = 0
         previousGuesses = []
+        previousGuessesField.text = ""
         if !allWords.isEmpty {
             wordToGuess = allWords[Int.random(in: 0..<allWords.count)]
             obscureWordToGuess()
@@ -121,12 +122,30 @@ class ViewController: UIViewController {
         guard let wordToGuess = wordToGuess else { return }
         guard let obscuredWordToGuess = obscuredWordToGuess else { return }
 
-        numberOfGuesses += 1
+        if(previousGuesses.contains(submission)) {
+            let ac = UIAlertController(title: "Hmm...", message: "It looks like you already guessed that letter. Try again.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default) {
+                [weak self] _ in
+                self?.guessField.text = ""
+            })
+            present(ac, animated: true)
+            return
+        }
         
         if submission.count == 1 {
-            if(wordToGuess.contains(Character(submission))) {
-                let realChars = Array(wordToGuess)
-                var obscuredChars = Array(obscuredWordToGuess)
+            let realChars = Array(wordToGuess)
+            var obscuredChars = Array(obscuredWordToGuess)
+            if(obscuredChars.contains(Character(submission))) {
+                let ac = UIAlertController(title: "Hmm...", message: "It looks like you already guessed that letter. Try again.", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default) {
+                    [weak self] _ in
+                    self?.guessField.text = ""
+                })
+                present(ac, animated: true)
+                return
+            }
+            else if(wordToGuess.contains(Character(submission))) {
+                numberOfGuesses += 1
                 for i in 0..<realChars.count {
                     if realChars[i] == Character(submission) {
                         obscuredChars[i] = Character(submission)
@@ -136,11 +155,13 @@ class ViewController: UIViewController {
                 wordToGuessLabel.text = String(obscuredChars)
             }
             else {
+                numberOfGuesses += 1
                 previousGuesses.append(submission)
                 previousGuessesField.text = previousGuesses.joined(separator: ", ")
             }
         }
         if submission.count > 1 && submission == wordToGuess {
+            numberOfGuesses += 1
             wordToGuessLabel.text = submission
             self.obscuredWordToGuess = submission
         }
