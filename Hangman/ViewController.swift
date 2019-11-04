@@ -50,6 +50,7 @@ class ViewController: UIViewController {
         guessField.layer.borderColor = UIColor.lightGray.cgColor
         guessField.layer.cornerRadius = 4
         guessField.autocapitalizationType = .none
+        guessField.
         
         guessField.leftView = sidePaddingView
         guessField.leftViewMode = .always
@@ -159,11 +160,6 @@ class ViewController: UIViewController {
                 previousGuesses.append(submission)
                 previousGuessesField.text = previousGuesses.joined(separator: ", ")
             }
-        }
-        if submission.count > 1 && submission == wordToGuess {
-            numberOfGuesses += 1
-            wordToGuessLabel.text = submission
-            self.obscuredWordToGuess = submission
         }
         if(self.obscuredWordToGuess == wordToGuess) {
             var successMessage: String
