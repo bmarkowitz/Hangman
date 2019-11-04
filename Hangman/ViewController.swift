@@ -50,7 +50,6 @@ class ViewController: UIViewController {
         guessField.layer.borderColor = UIColor.lightGray.cgColor
         guessField.layer.cornerRadius = 4
         guessField.autocapitalizationType = .none
-        guessField.
         
         guessField.leftView = sidePaddingView
         guessField.leftViewMode = .always
