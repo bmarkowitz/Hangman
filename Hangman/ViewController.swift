@@ -11,13 +11,14 @@ import UIKit
 class ViewController: UIViewController {
     
     var wordToGuessLabel: UILabel!
-    var previousGuessesLabel: UILabel!
+    var previousGuessesField: UITextField!
     var guessField: UITextField!
     var submitButton: UIButton!
     
     var allWords = [String]()
     var wordToGuess: String?
     var obscuredWordToGuess: String?
+    var previousGuesses = [String]()
     var numberOfGuesses = 0
     
     override func loadView() {
@@ -35,15 +36,16 @@ class ViewController: UIViewController {
         wordToGuessLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(wordToGuessLabel)
         
-        previousGuessesLabel = UILabel()
-        previousGuessesLabel.text = "Previous guesses go here"
-        previousGuessesLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(previousGuessesLabel)
+        previousGuessesField = UITextField()
+        previousGuessesField.placeholder = "Take a guess..."
+        previousGuessesField.isUserInteractionEnabled = false
+        previousGuessesField.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(previousGuessesField)
         
         guessField = UITextField()
         let sidePaddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: guessField.frame.height))
 
-        guessField.placeholder = "Placeholder"
+        guessField.placeholder = "Type here..."
         guessField.layer.borderWidth = 0.8
         guessField.layer.borderColor = UIColor.lightGray.cgColor
         guessField.layer.cornerRadius = 4
@@ -68,11 +70,11 @@ class ViewController: UIViewController {
             wordToGuessLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 100),
             wordToGuessLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            previousGuessesLabel.topAnchor.constraint(equalTo: wordToGuessLabel.bottomAnchor, constant: 25),
-            previousGuessesLabel.centerXAnchor.constraint(equalTo: wordToGuessLabel.centerXAnchor),
+            previousGuessesField.topAnchor.constraint(equalTo: wordToGuessLabel.bottomAnchor, constant: 25),
+            previousGuessesField.centerXAnchor.constraint(equalTo: wordToGuessLabel.centerXAnchor),
             
             guessField.widthAnchor.constraint(equalTo: wordToGuessLabel.widthAnchor),
-            guessField.topAnchor.constraint(equalTo: previousGuessesLabel.topAnchor, constant: 75),
+            guessField.topAnchor.constraint(equalTo: previousGuessesField.topAnchor, constant: 75),
             guessField.centerXAnchor.constraint(equalTo: wordToGuessLabel.centerXAnchor),
             guessField.heightAnchor.constraint(equalToConstant: 30),
             
@@ -95,6 +97,7 @@ class ViewController: UIViewController {
     
     func loadLevel() {
         numberOfGuesses = 0
+        previousGuesses = []
         if !allWords.isEmpty {
             wordToGuess = allWords[Int.random(in: 0..<allWords.count)]
             obscureWordToGuess()
@@ -121,21 +124,25 @@ class ViewController: UIViewController {
         numberOfGuesses += 1
         
         if submission.count == 1 {
-            let realChars = Array(wordToGuess)
-            var obscuredChars = Array(obscuredWordToGuess)
-            for i in 0..<realChars.count {
-                if realChars[i] == Character(submission) {
-                    obscuredChars[i] = Character(submission)
+            if(wordToGuess.contains(Character(submission))) {
+                let realChars = Array(wordToGuess)
+                var obscuredChars = Array(obscuredWordToGuess)
+                for i in 0..<realChars.count {
+                    if realChars[i] == Character(submission) {
+                        obscuredChars[i] = Character(submission)
+                    }
                 }
+                self.obscuredWordToGuess = String(obscuredChars)
+                wordToGuessLabel.text = String(obscuredChars)
             }
-            self.obscuredWordToGuess = String(obscuredChars)
-            wordToGuessLabel.text = String(obscuredChars)
-            guessField.text = ""
+            else {
+                previousGuesses.append(submission)
+                previousGuessesField.text = previousGuesses.joined(separator: ", ")
+            }
         }
         if submission.count > 1 && submission == wordToGuess {
             wordToGuessLabel.text = submission
             self.obscuredWordToGuess = submission
-            guessField.text = ""
         }
         if(self.obscuredWordToGuess == wordToGuess) {
             var successMessage: String
@@ -151,6 +158,7 @@ class ViewController: UIViewController {
             })
             present(ac, animated: true)
         }
+        guessField.text = ""
     }
 
 }
